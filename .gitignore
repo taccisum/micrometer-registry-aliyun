@@ -1,0 +1,23 @@
+*.log*.class
+*target/
+*.idea/
+*.svn/
+.idea/
+*.iml
+*.classpath
+*.project
+*.settings/
+*.DS_Store
+*.swp
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+/.factorypath
+
+/pb_test
+
+.evans.toml
