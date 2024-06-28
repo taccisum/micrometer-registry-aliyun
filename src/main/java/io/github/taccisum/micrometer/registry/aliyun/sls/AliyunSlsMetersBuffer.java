@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 阿里云 SLS 指标缓冲区，用于缓冲 micrometer registry 记录的指标，批量上报，以减少网络 I/O 次数，提升性能
+ *
  * @author taccisum - liaojinfeng6938@dingtalk.com
- * @since 2023/3/29
+ * @since 2024/6/28
  */
 @Slf4j
 public class AliyunSlsMetersBuffer {
@@ -20,9 +22,18 @@ public class AliyunSlsMetersBuffer {
 
     protected List<BasicSlsMeterDTO> meters = new ArrayList<>();
 
-    private LogProducer logProducer;
-    private String project;
-    private String logStore;
+    /**
+     * SLS Client
+     */
+    private final LogProducer logProducer;
+    /**
+     * 目标 Project
+     */
+    private final String project;
+    /**
+     * 目标 LogStore
+     */
+    private final String logStore;
 
     public AliyunSlsMetersBuffer(LogProducer logProducer, String project, String logStore) {
         this.logProducer = logProducer;

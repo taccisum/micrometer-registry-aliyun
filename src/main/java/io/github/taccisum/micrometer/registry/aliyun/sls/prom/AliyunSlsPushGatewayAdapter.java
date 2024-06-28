@@ -15,6 +15,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
+ * 采样数据要主动推送
+ *
  * @author taccisum - liaojinfeng6938@dingtalk.com
  * @since 2024/6/28
  */

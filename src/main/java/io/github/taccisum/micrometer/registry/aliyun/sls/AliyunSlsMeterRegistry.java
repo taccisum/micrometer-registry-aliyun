@@ -41,15 +41,14 @@ public class AliyunSlsMeterRegistry extends StepMeterRegistry {
             Meter.Id id = meter.getId();
             String name = this.getConventionName(id);
 
-            List<BasicSlsMeterDTO> dtos = new ArrayList<>();
+            List<BasicSlsMeterDTO> dtos = new ArrayList<>();        // TODO:: 这里有些奇怪，为啥需要这个 dtos
             String type;
 
-            if (meter instanceof Gauge) {
-                Gauge gauge = (Gauge) meter;
+            if (meter instanceof Gauge gauge) {
                 type = "gauge";
                 dtos.add(new SlsGaugeDTO().setValue(gauge.value()));
-            } else if (meter instanceof Counter) {
-                double count = ((Counter) meter).count();
+            } else if (meter instanceof Counter counter) {
+                double count = counter.count();
                 type = "counter";
                 dtos.add(new SlsCounterDTO().setCount(count));
 //            } else if (meter instanceof Timer) {
