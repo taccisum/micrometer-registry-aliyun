@@ -9,7 +9,9 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.step.StepFunctionCounter;
 import io.micrometer.core.instrument.step.StepMeterRegistry;
+import io.micrometer.core.instrument.step.StepTimer;
 import io.micrometer.core.instrument.util.NamedThreadFactory;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +53,13 @@ public class AliyunSlsMeterRegistry extends StepMeterRegistry {
                 double count = counter.count();
                 type = "counter";
                 dtos.add(new SlsCounterDTO().setCount(count));
+            } else if (meter instanceof StepTimer stepTimer) {
+                double totalTime = stepTimer.totalTime(getBaseTimeUnit());
+                type = "timer";
+                dtos.add(new SlsCounterDTO().setCount(totalTime));
+            } else if (meter instanceof StepFunctionCounter stepFunctionCounter) {
+                type = "step_function_counter";
+                dtos.add(new SlsCounterDTO().setCount(stepFunctionCounter.count()));
 //            } else if (meter instanceof Timer) {
 //                Timer timer = (Timer) meter;
 //                timer.max(TimeUnit.MILLISECONDS);
