@@ -7,6 +7,8 @@ import io.github.taccisum.micrometer.registry.aliyun.sls.dto.BasicSlsMeterDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StopWatch;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +19,7 @@ import java.util.List;
  * @since 2024/6/28
  */
 @Slf4j
-public class AliyunSlsMetersBuffer {
+public class AliyunSlsMetersBuffer implements Closeable {
     protected static final int THRESHOLD = 1000;
 
     protected List<BasicSlsMeterDTO> meters = new ArrayList<>();
@@ -68,7 +70,7 @@ public class AliyunSlsMetersBuffer {
             for (BasicSlsMeterDTO meter : this.meters) {
                 items.add(meter.toMetricsLogItem());
             }
-            this.meters.clear();
+            this.clear();
         }
         sw.stop();
         if (items.isEmpty()) return;
@@ -93,6 +95,19 @@ public class AliyunSlsMetersBuffer {
             });
         } catch (InterruptedException | ProducerException e) {
             log.warn(String.format("Fail to flush meters into Aliyun logstore '%s' of project '%s'", logStore, project), e);
+        }
+    }
+
+    public void clear() {
+        if (this.meters != null) this.meters.clear();
+    }
+
+    @Override
+    public void close() throws IOException {
+        try {
+            if (this.logProducer != null) this.logProducer.close();
+        } catch (InterruptedException | ProducerException e) {
+            throw new RuntimeException(e);
         }
     }
 }

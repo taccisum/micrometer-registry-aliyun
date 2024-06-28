@@ -5,7 +5,6 @@ import com.aliyun.openservices.aliyun.log.producer.ProducerConfig;
 import com.aliyun.openservices.aliyun.log.producer.ProjectConfig;
 import io.micrometer.core.instrument.Clock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -46,7 +45,11 @@ public class AliyunSlsMetricsReportAutoConfiguration {
 
     @Bean(destroyMethod = "close")
     @ConditionalOnMissingBean
-    public LogProducer metricsLogProducer() {
+    public AliyunSlsMetersBuffer aliyunSlsMetersBuffer() {
+        return new AliyunSlsMetersBuffer(newMetricsLogProducer(properties), properties.getProject(), properties.getLogStore());
+    }
+
+    private LogProducer newMetricsLogProducer(AliyunSlsMetricsProperties properties) {
         ProducerConfig config = new ProducerConfig();
         LogProducer producer = new LogProducer(config);
         ProjectConfig projectConfig = new ProjectConfig(
@@ -57,13 +60,5 @@ public class AliyunSlsMetricsReportAutoConfiguration {
         );
         producer.putProjectConfig(projectConfig);
         return producer;
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public AliyunSlsMetersBuffer aliyunSlsMetersBuffer(
-            @Autowired @Qualifier("metricsLogProducer") LogProducer metricsLogProducer
-    ) {
-        return new AliyunSlsMetersBuffer(metricsLogProducer, properties.getProject(), properties.getLogStore());
     }
 }
